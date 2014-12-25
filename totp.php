@@ -1,6 +1,6 @@
 <?php
 /*
-    TOTP v0.1.0 - a simple TOTP (RFC 6238) class using the SHA1 default
+    TOTP v0.1.1 - a simple TOTP (RFC 6238) class using the SHA1 default
 
     (c) 2014 Robin Leffmann <djinn at stolendata dot net>
 
@@ -33,6 +33,8 @@ class TOTP
     {
         if( strlen($secret) < 16 || strlen($secret) % 8 != 0 )
             return [ 'err'=>'length of secret must be a multiple of 8, and at least 16 characters' ];
+        if( preg_match('/[^a-z2-7]/i', $secret) === 1 )
+            return [ 'err'=>'secret contains non-base32 characters' ];
         if( $digits < 6 || $digits > 8 )
             return [ 'err'=>'digits must be 6, 7 or 8' ];
 
