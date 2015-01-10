@@ -47,15 +47,14 @@ class TOTP
         return [ 'otp'=>sprintf("%'0{$digits}u", $otp) ];
     }
 
-    function genSecret( $length = 16 )
+    function genSecret( $length = 24 )
     {
         if( $length < 16 || $length % 8 != 0 )
             return [ 'err'=>'length must be a multiple of 8, and at least 16' ];
 
         while( $length-- )
         {
-            $c = @gettimeofday();
-            $c = $c['usec'] % 13;
+            $c = @gettimeofday()['usec'] % 53;
             while( $c-- )
                 mt_rand();
             @$secret .= self::$base32Map[mt_rand(0, 31)];

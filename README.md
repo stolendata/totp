@@ -13,9 +13,19 @@ Simply call `TOTP::getOTP( $secret [, $digits = 6 [, $period = 30 ]] )` which re
 
 The other two functions are meant to be convenient utilities:
 
-`TOTP::genSecret( [ $length = 16 ] )` generates a TOTP-compatible secret in Base32 ASCII, returning an array with the key `secret` holding the randomized secret or the key `err` describing an eventual error.
+`TOTP::genSecret( [ $length = 24 ] )` generates a TOTP-compatible secret in Base32 ASCII, returning an array with the key `secret` holding the random secret or the key `err` describing an eventual error.
 
 `TOTP::genURI( $label, $secret, $digits, $period )` returns a string holding an `otpauth://` style URI providing the supplied parameters, which can f.e. be embedded in a QR code image.
+
+
+Donations
+---------
+
+BTC: 1EDhbo9ejdKUxNW3GPBh1UmocC1ea1TvE5  
+LTC: LaDuRFwEt1V26pmJJH94auDvxqN3rRFqPj  
+DOGE: DJ7vQ1dNRfebb1umVHsHxoMcd2Zq5L6LKp  
+VTC: VwDmyMR5udPkEwTJhxDsUB2C3mk8NKCSD8  
+DRK: XvHfibq2f1xU6rYqAULVXHLPuRhBawzTZs  
 
 
 License
