@@ -13,7 +13,7 @@ class TOTP
 {
     private static $base32Map = 'abcdefghijklmnopqrstuvwxyz234567';
 
-    private function base32Decode( $in )
+    private static function base32Decode( $in )
     {
         $l = strlen( $in );
         $n = $bs = 0;
@@ -29,7 +29,7 @@ class TOTP
         return $out;
     }
 
-    function getOTP( $secret, $digits = 6, $period = 30 )
+    public static function getOTP( $secret, $digits = 6, $period = 30 )
     {
         if( strlen($secret) < 16 || strlen($secret) % 8 != 0 )
             return [ 'err'=>'length of secret must be a multiple of 8, and at least 16 characters' ];
@@ -47,7 +47,7 @@ class TOTP
         return [ 'otp'=>sprintf("%'0{$digits}u", $otp) ];
     }
 
-    function genSecret( $length = 24 )
+    public static function genSecret( $length = 24 )
     {
         if( $length < 16 || $length % 8 != 0 )
             return [ 'err'=>'length must be a multiple of 8, and at least 16' ];
@@ -63,7 +63,7 @@ class TOTP
         return [ 'secret'=>strtoupper($secret) ];
     }
 
-    function genURI( $label, $secret, $digits, $period )
+    public static function genURI( $label, $secret, $digits, $period )
     {
         return 'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret&digits=$digits&period=$period";
     }
