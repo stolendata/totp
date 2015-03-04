@@ -63,9 +63,11 @@ class TOTP
         return [ 'secret'=>strtoupper($secret) ];
     }
 
-    public static function genURI( $label, $secret, $digits, $period )
+    public static function genURI( $label, $secret, $digits = null, $period = null )
     {
-        return 'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret&digits=$digits&period=$period";
+        return 'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
+		(isset($digits)?"&digits=$digits":"") .
+		(isset($period)?"&period=$period":"");
     }
 }
 ?>
