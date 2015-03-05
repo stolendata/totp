@@ -1,6 +1,6 @@
 <?php
 /*
-    TOTP v0.1.1 - a simple TOTP (RFC 6238) class using the SHA1 default
+    TOTP v0.1.2 - a simple TOTP (RFC 6238) class using the SHA1 default
 
     (c) 2014 Robin Leffmann <djinn at stolendata dot net>
 
@@ -63,9 +63,14 @@ class TOTP
         return [ 'secret'=>strtoupper($secret) ];
     }
 
-    public static function genURI( $label, $secret, $digits, $period )
+    public static function genURI( $label, $secret, $digits = false, $period = false )
     {
-        return 'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret&digits=$digits&period=$period";
+        if( empty($label) || empty($secret) )
+            return [ err=>'you must provide at least a label and a secret' ];
+
+        return [ uri=>'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
+                      (empty($digits) ? '' : "&digits=$digits") .
+                      (empty($period) ? '' : "&period=$period") ];
     }
 }
 ?>

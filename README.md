@@ -15,7 +15,7 @@ The other two functions are meant to be convenient utilities:
 
 `TOTP::genSecret( [ $length = 24 ] )` generates a TOTP-compatible secret in Base32 ASCII, returning an array with the key `secret` holding the random secret or the key `err` describing an eventual error.
 
-`TOTP::genURI( $label, $secret, $digits, $period )` returns a string holding an `otpauth://` style URI providing the supplied parameters, which can f.e. be embedded in a QR code image.
+`TOTP::genURI( $label, $secret [, $digits = false [, $period = false]] )` returns an array with the key `uri` holding an `otpauth://` style URI providing the supplied parameters, which can f.e. be embedded in a QR code image, or the key `err` describing an eventual error.
 
 
 Donations
