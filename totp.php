@@ -66,11 +66,11 @@ class TOTP
     public static function genURI( $label, $secret, $digits = false, $period = false )
     {
         if( empty($label) || empty($secret) )
-            return [ err=>'you must provide at least a label and a secret' ];
+            return [ 'err'=>'you must provide at least a label and a secret' ];
 
-        return [ uri=>'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
-                      (empty($digits) ? '' : "&digits=$digits") .
-                      (empty($period) ? '' : "&period=$period") ];
+        return [ 'uri'=>'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
+                        (empty($digits) ? '' : "&digits=$digits") .
+                        (empty($period) ? '' : "&period=$period") ];
     }
 }
 ?>
