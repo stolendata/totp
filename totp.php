@@ -64,7 +64,7 @@ class TOTP
 
     public static function genURI( $account, $secret, $digits = null, $period = null, $issuer = null )
     {
-        if( is_null($account) || is_null($secret) )
+        if( empty($account) || empty($secret) )
             return [ 'err'=>'you must provide at least an account and a secret' ];
         if( mb_strpos($account . $issuer, ':') !== false )
             return [ 'err'=>'neither account nor issuer can contain a colon character' ];
