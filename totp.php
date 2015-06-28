@@ -1,25 +1,38 @@
 <?php
-/*
-    TOTP v0.1.2 - a simple TOTP (RFC 6238) class using the SHA1 default
-
-    (c) 2014 Robin Leffmann <djinn at stolendata dot net>
-
-    https://github.com/stolendata/totp/
-
-    Licensed under CC BY-NC-SA 4.0 - http://creativecommons.org/licenses/by-nc-sa/4.0/
+/**
+ * TOTP
+ * A simple TOTP (RFC 6238) class using the SHA1 default
+ *
+ * @author      Robin Leffmann <djinn at stolendata dot net> et al
+ * @copyright   2014 Robin Leffmann
+ * @link        https://github.com/stolendata/totp
+ * @license     Creative Commons BY-NC-SA 4.0
+ * @link        http://creativecommons.org/licenses/by-nc-sa/4.0
+ *
+ * @since       2014
+ * @edited      $Date$
+ * @version     $Id$
+ *
+ * @category    PHP Class
+ * @package     TOTP 
 */
 
 class TOTP
 {
     private static $base32Map = 'abcdefghijklmnopqrstuvwxyz234567';
 
+    /**
+     * Base32 Decode
+     *
+     * @param   string  $in
+     * @return  string
+    */    
     private static function base32Decode( $in )
     {
         $l = strlen( $in );
         $n = $bs = 0;
 
-        for( $i = 0; $i < $l; $i++ )
-        {
+        for( $i = 0; $i < $l; $i++ ) {
             $n <<= 5;
             $n += stripos( self::$base32Map, $in[$i] );
             $bs = ( $bs + 5 ) % 8;
@@ -29,6 +42,14 @@ class TOTP
         return $out;
     }
 
+    /**
+     * Generate an OTP
+     *
+     * @param   string  $secret
+     * @param   int     $digits
+     * @param   int     $period
+     * @return  array
+    */    
     public static function getOTP( $secret, $digits = 6, $period = 30 )
     {
         if( strlen($secret) < 16 || strlen($secret) % 8 != 0 )
@@ -47,13 +68,18 @@ class TOTP
         return [ 'otp'=>sprintf("%'0{$digits}u", $otp) ];
     }
 
+    /**
+     * Generate a secret
+     *
+     * @param   int  $length
+     * @return  array
+    */    
     public static function genSecret( $length = 24 )
     {
         if( $length < 16 || $length % 8 != 0 )
             return [ 'err'=>'length must be a multiple of 8, and at least 16' ];
 
-        while( $length-- )
-        {
+        while( $length-- ) {
             $c = @gettimeofday()['usec'] % 53;
             while( $c-- )
                 mt_rand();
@@ -63,14 +89,31 @@ class TOTP
         return [ 'secret'=>strtoupper($secret) ];
     }
 
-    public static function genURI( $label, $secret, $digits = false, $period = false )
+    /**
+     * Generate an OTP URI
+     * 
+     * @param   string  $issuedBy
+     * @param   string  $label
+     * @param   string  $secret
+     * @param   boolean $digits
+     * @param   int     $period
+     * @return  array
+    */
+    public static function genURI( $issuedBy = '', $label, $secret, $digits = false, $period = null )
     {
-        if( empty($label) || empty($secret) )
-            return [ 'err'=>'you must provide at least a label and a secret' ];
+        if( empty($label) OR empty($secret) ) {
+            return [ 'err'=>'you must provide at least a label and a secret' ];            
+        }
 
-        return [ 'uri'=>'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
-                        (empty($digits) ? '' : "&digits=$digits") .
-                        (empty($period) ? '' : "&period=$period") ];
+        if( strlen( trim( $issuedBy ) ) ) {
+            $issuedBy = rawurlencode( $issuedBy ).':';
+        } else {
+            $issuedBy = '';
+        }
+        
+        
+        return [ 'uri'=>'otpauth://totp/' .$issuedBy . rawurlencode( $label ) . "?secret=$secret" .
+                        ( !strlen($digits) ? '' : "&digits=$digits") .
+                        ( !strlen($period) ? '' : "&period=$period") ];
     }
 }
-?>
