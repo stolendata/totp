@@ -3,13 +3,13 @@
  * TOTP
  * A simple TOTP (RFC 6238) class using the SHA1 default
  *
- * @author      Robin Leffmann <djinn at stolendata dot net>
+ * @author      Robin Leffmann <djinn at stolendata dot net> et al
  * @copyright   2014 Robin Leffmann
  * @link        https://github.com/stolendata/totp
  * @license     Creative Commons BY-NC-SA 4.0
  * @link        http://creativecommons.org/licenses/by-nc-sa/4.0
  *
- * @since       March 2015
+ * @since       2014
  * @edited      $Date$
  * @version     $Id$
  *
