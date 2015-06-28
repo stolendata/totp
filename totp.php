@@ -1,6 +1,6 @@
 <?php
 /*
-    TOTP v0.1.2 - a simple TOTP (RFC 6238) class using the SHA1 default
+    TOTP v0.2.0 - a simple TOTP (RFC 6238) class using the SHA1 default
 
     (c) 2014 Robin Leffmann <djinn at stolendata dot net>
 
@@ -11,7 +11,7 @@
 
 class TOTP
 {
-    private static $base32Map = 'abcdefghijklmnopqrstuvwxyz234567';
+    private static $base32Map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
     private static function base32Decode( $in )
     {
@@ -29,7 +29,7 @@ class TOTP
         return $out;
     }
 
-    public static function getOTP( $secret, $digits = 6, $period = 30 )
+    public static function getOTP( $secret, $digits = 6, $period = 30, $offset = null )
     {
         if( strlen($secret) < 16 || strlen($secret) % 8 != 0 )
             return [ 'err'=>'length of secret must be a multiple of 8, and at least 16 characters' ];
@@ -39,8 +39,7 @@ class TOTP
             return [ 'err'=>'digits must be 6, 7 or 8' ];
 
         $seed = self::base32Decode( $secret );
-        $time = intval( time() / $period );
-        $time = str_pad( pack('N', $time), 8, "\x00", STR_PAD_LEFT );
+        $time = str_pad( pack('N', intval(time() / $period) + $offset ), 8, "\x00", STR_PAD_LEFT );
         $hash = hash_hmac( 'sha1', $time, $seed, false );
         $otp = ( hexdec(substr($hash, hexdec($hash[39]) * 2, 8)) & 0x7fffffff ) % pow( 10, $digits );
 
@@ -60,17 +59,24 @@ class TOTP
             @$secret .= self::$base32Map[mt_rand(0, 31)];
         }
 
-        return [ 'secret'=>strtoupper($secret) ];
+        return [ 'secret'=>$secret ];
     }
 
-    public static function genURI( $label, $secret, $digits = false, $period = false )
+    public static function genURI( $account, $secret, $digits = null, $period = null, $issuer = null )
     {
-        if( empty($label) || empty($secret) )
-            return [ 'err'=>'you must provide at least a label and a secret' ];
+        if( is_null($account) || is_null($secret) )
+            return [ 'err'=>'you must provide at least an account and a secret' ];
+        if( mb_strpos($account . $issuer, ':') !== false )
+            return [ 'err'=>'neither account nor issuer can contain a colon character' ];
 
-        return [ 'uri'=>'otpauth://totp/' . rawurlencode( $label ) . "?secret=$secret" .
-                        (empty($digits) ? '' : "&digits=$digits") .
-                        (empty($period) ? '' : "&period=$period") ];
+        $account = rawurlencode( $account );
+        $issuer = rawurlencode( $issuer );
+        $label = empty( $issuer ) ? $account : "$issuer:$account";
+
+        return [ 'uri'=>'otpauth://totp/' . $label . "?secret=$secret" .
+                        (is_null($digits) ? '' : "&digits=$digits") .
+                        (is_null($period) ? '' : "&period=$period") .
+                        (empty($issuer) ? '' : "&issuer=$issuer") ];
     }
 }
 ?>
