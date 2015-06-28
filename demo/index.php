@@ -16,7 +16,7 @@
  * @package     TOTP
 */
 
-require_once('includes/totp.php');
+require_once( dirname( dirname( __FILE__ ) ).'/totp.php');
 require_once('includes/phpqrcode/qrlib.php');
 
 // START:   change me
