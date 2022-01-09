@@ -1,6 +1,6 @@
 <?php
 /*
-    TOTP v0.2.1 - a simple TOTP (RFC 6238) class using the SHA1 default
+    TOTP v0.3.0 - a simple TOTP (RFC 6238) class
 
     (c) 2014 Robin Leffmann <djinn at stolendata dot net>
 
@@ -29,7 +29,7 @@ class TOTP
         return $out;
     }
 
-    public static function getOTP( $secret, $digits = 6, $period = 30, $offset = 0 )
+    public static function getOTP( $secret, $digits = 6, $period = 30, $offset = 0, $algo = 'sha1' )
     {
         if( strlen($secret) < 16 || strlen($secret) % 8 != 0 )
             return [ 'err'=>'length of secret must be a multiple of 8, and at least 16 characters' ];
@@ -38,11 +38,13 @@ class TOTP
         $digits = intval( $digits );
         if( $digits < 6 || $digits > 8 )
             return [ 'err'=>'digits must be 6, 7 or 8' ];
+        if( in_array(strtolower($algo), ['sha1', 'sha256', 'sha512']) === false )
+            return [ 'err'=>'algo must be SHA1, SHA256 or SHA512' ];
 
         $seed = self::base32Decode( $secret );
         $time = str_pad( pack('N', intval($offset + time() / $period)), 8, "\x00", STR_PAD_LEFT );
-        $hash = hash_hmac( 'sha1', $time, $seed, false );
-        $otp = ( hexdec(substr($hash, hexdec($hash[39]) * 2, 8)) & 0x7fffffff ) % pow( 10, $digits );
+        $hash = hash_hmac( strtolower($algo), $time, $seed, false );
+        $otp = ( hexdec(substr($hash, hexdec($hash[-1]) * 2, 8)) & 0x7fffffff ) % pow( 10, $digits );
 
         return [ 'otp'=>sprintf("%'0{$digits}u", $otp) ];
     }
@@ -63,7 +65,7 @@ class TOTP
         return [ 'secret'=>$secret ];
     }
 
-    public static function genURI( $account, $secret, $digits = null, $period = null, $issuer = null )
+    public static function genURI( $account, $secret, $digits = null, $period = null, $issuer = null, $algo = null )
     {
         if( empty($account) || empty($secret) )
             return [ 'err'=>'you must provide at least an account and a secret' ];
@@ -75,6 +77,7 @@ class TOTP
         $label = empty( $issuer ) ? $account : "$issuer:$account";
 
         return [ 'uri'=>'otpauth://totp/' . $label . "?secret=$secret" .
+                        (is_null($algo) ? '' : "&algorithm=$algo") .
                         (is_null($digits) ? '' : "&digits=$digits") .
                         (is_null($period) ? '' : "&period=$period") .
                         (empty($issuer) ? '' : "&issuer=$issuer") ];
